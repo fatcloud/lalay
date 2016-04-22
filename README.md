@@ -1,2 +1,2 @@
 # lalay
-a project that save you life time as an administrative  assistant
+A project that save your life time as an administrative assistant so that you can lalay more.
