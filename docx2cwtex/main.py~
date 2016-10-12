@@ -1,0 +1,44 @@
+#! /usr/bin/env python3
+import docx
+from delimiters_and_newline import beautiful_lines
+from os import listdir, getcwd
+
+# 在所在的資料夾裡尋找 docx 檔案名，也接受大寫 DOCX
+# 接著排除掉第一個字是 . 的檔案（通常是暫存的隱藏檔）
+all_docx_names = [f for f in listdir('.') if f.lower()[-5:] == '.docx']
+docx_names     = [f for f in all_docx_names if f[0] is not '.']
+
+
+# 沒有找到要處理的檔案時回報錯誤
+if len(docx_names) == 0:
+    print("No docx file is found at", getcwd())
+    print("Please put your file in here with me.")
+    exit()
+
+
+# 正常開工
+for filename in docx_names:
+    # 打開目標 docx 檔
+    doc = docx.Document(filename)
+    
+    # 打開要寫入的檔案
+    f = open(filename + ".txt", "w")
+    
+    # 讀取所有的段落
+    for paragraph in doc.paragraphs:
+        
+        # 把每個段落都拿來美容
+        lines = beautiful_lines(paragraph.text)
+        
+        # 輸出一個空行，再把整個段落裡所有的文字都輸出到檔案裡
+        print("", file=f)
+        for line in lines:
+            print(line, file=f)
+            
+    # 關閉輸出完成的檔案
+    f.close()
+
+
+# 正常完工
+print("Process finished. Totally", len(docx_names), "files were processed")
+
