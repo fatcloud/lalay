@@ -78,11 +78,9 @@ def newlines_on_delimiter(paragraph):
 
 # ====================== 任務三：取代所有的括弧 ========================
 
-def fix_parentheses(paragraph):
+def replace_items(paragraph, replacer):
     paragraph_out = ""
     
-    replacer = { '(' : '\ (',
-                 ')' : ')\ '}
     tokens = cut_into_pieces(paragraph, replacer.keys())
     for token in tokens:
         if token in replacer.keys():
@@ -103,8 +101,12 @@ def beautify(paragraph):
     # 任務二：見到標點符號就分割成新的空行
     paragraph = newlines_on_delimiter(paragraph)
     
-    # 任務三：把括弧取代掉
-    paragraph = fix_parentheses(paragraph)
+    # 任務三：把括弧和百分比取代掉
+    replacer = { '(' : '\ (',
+                 ')' : ')\ ',
+                 '%' : '\%'}
+
+    paragraph = replace_items(paragraph, replacer)
     
     return paragraph
 
