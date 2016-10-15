@@ -56,7 +56,7 @@ def fix_space_and_comma(paragraph):
         
         # 找出包含這個 token 在內的上一個語言
         idx = index
-        while(idx > 0 and prev_language == 'not sure'):
+        while(idx >= 0 and prev_language == 'not sure'):
             prev_language = char_type(tokens[idx][-1:])
             idx = idx - 1
         
@@ -70,9 +70,6 @@ def fix_space_and_comma(paragraph):
             # 背景是中文的情況下，把空白刪除，並且把小寫逗點換大寫
             if token in replacer.keys():
                 tokens[index] = replacer[token]
-        
-        #if prev_language == 'not sure':
-        #    print('yo', token, index)
         
     paragraph_out = ''.join(tokens)
 
@@ -127,6 +124,9 @@ def beautify(paragraph):
     # 任務三：把括弧和百分比取代掉
     replacer = { '(' : '\ (',
                  ')' : ')\ ',
+                 '（' : '\ (',
+                 '）' : ')\ ',
+                 '－' : '-',
                  '%' : '\%'}
 
     paragraph = replace_items(paragraph, replacer)
