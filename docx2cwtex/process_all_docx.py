@@ -126,7 +126,7 @@ def beautify(paragraph):
                  ')' : ')\ ',
                  '（' : '\ (',
                  '）' : ')\ ',
-                 '－' : '-',
+                 '─' : '-',
                  '%' : '\%'}
 
     paragraph = replace_items(paragraph, replacer)
