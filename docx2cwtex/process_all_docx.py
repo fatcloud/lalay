@@ -30,28 +30,51 @@ def fix_space_and_comma(paragraph):
     tokens = cut_into_pieces(paragraph, [',', ' '])
 
     paragraph_out = ""
-    context_is_chinese = False
+    context_language = 'not sure'
 
     replacer = {' '  : '' ,     # 空白轉成無字元
                 '\t' : '' ,     # tab 也轉成無字元
                 ','  : '，'}    # 小寫逗點轉成大寫
 
-    for token in tokens:
-        # 以下視情況切換中英模式：都字母的話當然英文，Unicode 數字超過一萬八成是中文
+    # 定義一個用來檢查字元是英文還是中文或不確定的小函數
+    def char_type(char):
+        if char == '': return 'not sure'
         
-        unicode_last_char = ord(token[-1:])
-        if unicode_last_char in range(65,91) or unicode_last_char in range(97,123):
-            context_is_chinese = False
+        unicode_of_char = ord(char)
+        is_english = unicode_of_char in range(65,91) or unicode_of_char in range(97,123)
+        is_chinese = unicode_of_char > 10000
         
-        elif unicode_last_char > 10000:
-            context_is_chinese = True
-            
-        elif context_is_chinese and token in replacer:
-            # token 非中非英而是符號，而且背景是中文的情況下，把空白刪除，並且把小寫逗點換大寫
-            token = replacer[token]
+        if is_english: return 'english'
+        elif is_chinese: return 'chinese'
+        else: return 'not sure'
         
-        # 把處理完的 token 接上 clean_paragraph
-        paragraph_out += token
+    # 現在來依序檢查整段文字
+    for index, token in enumerate(tokens):
+        
+        # 我們依據每個 token 前後文的語言來決定要不要處理
+        prev_language, next_language = 'not sure', 'not sure'
+        
+        # 找出包含這個 token 在內的上一個語言
+        idx = index
+        while(idx > 0 and prev_language == 'not sure'):
+            prev_language = char_type(tokens[idx][-1:])
+            idx = idx - 1
+        
+        # 這個 token 往後看的下一個語言
+        idx = index + 1
+        while(idx < len(tokens) and next_language == 'not sure'):
+            next_language = char_type(tokens[idx][0])
+            idx = idx + 1
+        
+        if prev_language in ['not sure', 'chinese'] or next_language == 'chinese':
+            # 背景是中文的情況下，把空白刪除，並且把小寫逗點換大寫
+            if token in replacer.keys():
+                tokens[index] = replacer[token]
+        
+        #if prev_language == 'not sure':
+        #    print('yo', token, index)
+        
+    paragraph_out = ''.join(tokens)
 
     return paragraph_out
 
@@ -138,22 +161,18 @@ def process_all_docx(directory):
         # 打開目標 docx 檔
         doc = docx.Document(filename)
         
-        # 打開要寫入的檔案
-        f = open(filename + ".txt", "w")
-        
-        # 讀取所有的段落
+        # 讀取所有的段落組合成一篇超長的文字
+        all_paragraph_list = []
         for paragraph in doc.paragraphs:
+            all_paragraph_list.append(paragraph.text)
+        
+        all_paragraph = '\n'.join(all_paragraph_list)
+        beautified_all_paragraph = beautify(all_paragraph)
             
-            # 把每個段落都拿來美容
-            p = beautify(paragraph.text)
+        # 把整個段落裡所有的文字都輸出到檔案裡
+        with open(filename + ".txt", "w") as f:
+            print(beautified_all_paragraph, file=f)
             
-            # 輸出一個空行，再把整個段落裡所有的文字都輸出到檔案裡
-            print("", file=f)
-            print(p, file=f)
-                
-        # 關閉輸出完成的檔案
-        f.close()
-
 
     # 正常完工
     print("Process finished. Totally", len(docx_names), "files were processed")
