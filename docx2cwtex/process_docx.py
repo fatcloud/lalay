@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #! /usr/bin/env python3
 
 # 這個函數會把 text 裡面的字用 cutter list 裡的字元切開，放進一個 list 以後回傳
@@ -136,11 +137,40 @@ def beautify(paragraph):
 
 
 
+# ============ 轉換一個 docx 檔案 ==============
+
+import docx
+from io import StringIO
+
+
+def docx2cwtex(docx_filename, asfile=False):
+    doc = docx.Document(docx_filename)
+    
+    # 讀取所有的段落組合成一篇超長的文字
+    all_paragraph_list = []
+    for paragraph in doc.paragraphs:
+        all_paragraph_list.append(paragraph.text)
+    
+    all_paragraph = '\n'.join(all_paragraph_list)
+    beautified_all_paragraph = beautify(all_paragraph)
+        
+    # 把換行符號轉換成 windows 下的格式
+    textout = beautified_all_paragraph.replace('\n', '\r\n')
+    
+    if asfile:
+        myfile = StringIO(textout)
+        return myfile
+    else:
+        return textout
+
+
+
+
+
 # ============ 找出 directory 底下所有的 docx 檔，全部 beautify 並輸出 ==============
 
 def process_all_docx(directory):
 
-    import docx
     from os import listdir, getcwd
 
     # 在所在的資料夾裡尋找 docx 檔案名，也接受大寫 DOCX
@@ -158,21 +188,8 @@ def process_all_docx(directory):
 
     # 正常開工
     for filename in docx_names:
-        # 打開目標 docx 檔
-        doc = docx.Document(filename)
-        
-        # 讀取所有的段落組合成一篇超長的文字
-        all_paragraph_list = []
-        for paragraph in doc.paragraphs:
-            all_paragraph_list.append(paragraph.text)
-        
-        all_paragraph = '\n'.join(all_paragraph_list)
-        beautified_all_paragraph = beautify(all_paragraph)
-            
-        # 把整個段落裡所有的文字都輸出到檔案裡
         with open(filename + ".txt", "w") as f:
-            print(beautified_all_paragraph, file=f)
-            
+            print(docx2cwtex(filename), file=f)   
 
     # 正常完工
     print("Process finished. Totally", len(docx_names), "files were processed")

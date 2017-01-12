@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<meta charset="utf-8">
+<head>
+    <meta charset="utf-8">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+    <title>南光淨化器</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h1>南光淨化器</h1>
+            <p>把陳南光老師傳來的 docx 檔案梳理成純淨無暇、隨時可以做成 cwTex 原始碼的文字檔</p>
+        </div>
+
+        <!-- Change /upload-target to your upload address -->
+        <form action="/docx2cwtex/" method="post" enctype="multipart/form-data" class="">
+            {% csrf_token %}
+            <h4>選擇要處理的 .docx 檔案</h4>
+            <div class="input-group" ng-app="myApp" ng-controller="myCtrl">
+            	<label class="input-group-btn">
+                	<span class="btn btn-primary">
+                        選擇 docx 檔案 <input type="file" style="display: none;" name="docxin" id="fileSelected">
+                    </span>
+                </label>
+                <input type="text" class="form-control" readonly="" id="fileFeedback">
+            </div>
+            <br>
+            <h4>按這裡 上傳+處理+下載 三個願望一次滿足</h4>
+          	<button type="submit" class="btn btn-success">快給老娘轉成純淨的文字檔</button>
+
+        </form>
+    </div>
+
+    <script>
+    $('#fileSelected').on('change', function (evt) {
+    var files = $(evt.currentTarget).get(0).files;
+
+    if(files.length > 0) {
+        $('#fileFeedback').attr("value", files[0].name);
+    }});
+	</script>
+
+</body>
+
+</html>
